@@ -18,14 +18,7 @@ let sign = true;
 
 function setup() {
   const canvas = createCanvas(windowWidth, windowHeight);
-  // workInput = createInput("25");
-  // workInput.position(windowWidth - 200, windowHeight - 200);
-  // workInput.size(150);
-  // workInput.style("font-size", "32px");
-  // workInput.style("padding", "10px 20px");
-  // workInput.style("border", "2px solid black");
-  // workInput.style("border-radius", "5px");
-  // workInput.style("text-align", "center");
+  canvas.parent("canvas-container");
   workInput = document.querySelector("#workInput");
   workInput.value = "25";
   workInput.onchange = () => {
@@ -58,8 +51,8 @@ function setup() {
       }
     }
   };
-
-  canvas.drop(gotFile);
+  
+  // canvas.drop(gotFile);
 
   fft = new p5.FFT(0.8, 64 * 4);
   volume = new p5.Amplitude(0.9);
@@ -171,69 +164,144 @@ function draw() {
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
-  // toggleButton.position(windowWidth / 2 - 75, windowHeight / 2 + 100);
-  workInput.position(windowWidth - 200, windowHeight - 200);
-  breakInput.position(windowWidth - 200, windowHeight - 120);
 }
 
-function gotFile(file) {
-  if (file.type === "audio") {
-    console.log(file);
-    canvasText = "Playing audio...";
-    // redraw();
-    loadSound(
-      file.data,
-      (sound) => {
-        timer.start();
-        if (song) {
+// function gotFile(file) {
+//   if (file.type === "audio") {
+//     console.log(file);
+//     canvasText = "Playing audio...";
+//     // redraw();
+//     loadSound(
+//       file.data,
+//       (sound) => {
+//         timer.start();
+//         if (song) {
+//           song.stop();
+//         }
+//         song = sound;
+//         song.loop();
+//       },
+//       () => {
+//         console.log("error loading audio file");
+//       },
+//       () => {
+//         console.log("now loading...");
+//       }
+//     );
+//   } else {
+//     // If the file dropped into the canvas is not an image,
+//     // change the instructions to 'Not an image file!'
+//     canvasText = "Not an audio file!";
+//     redraw();
+//   }
+// }
+
+const playlist = [];
+const playlistElement = document.getElementById("playlist");
+const dropZone = document.getElementById("dropZone");
+
+dropZone.addEventListener("dragover", (event) => {
+  event.preventDefault();
+  dropZone.classList.add("bg-light");
+});
+
+dropZone.addEventListener("dragleave", () => {
+  dropZone.classList.remove("bg-light");
+});
+
+dropZone.addEventListener("drop", (event) => {
+  event.preventDefault();
+  dropZone.classList.remove("bg-light");
+
+  const files = event.dataTransfer.files;
+  for (const file of files) {
+    if (file.type.startsWith("audio/")) {
+      const url = URL.createObjectURL(file);
+      const name = file.name;
+
+      const li = document.createElement("li");
+      li.className = "list-group-item d-flex justify-content-between align-items-center";
+      li.textContent = name;
+
+      li.addEventListener("click", () => {
+        if (song && song.isPlaying()) {
           song.stop();
         }
-        song = sound;
-        song.loop();
-      },
-      () => {
-        console.log("error loading audio file");
-      },
-      () => {
-        console.log("now loading...");
-      }
-    );
-  } else {
-    // If the file dropped into the canvas is not an image,
-    // change the instructions to 'Not an image file!'
-    canvasText = "Not an audio file!";
-    redraw();
-  }
-}
-
-function gotFiles(files) {
-  for (let i = 0; i < files.length; i++) {
-    if (files[i].type === "audio") {
-      console.log(files[i]);
-      canvasText = "Playing audio...";
-      // redraw();
-      loadSound(
-        files[i].data,
-        (sound) => {
-          timer.start();
-          if (song) {
-            song.stop();
-          }
+        loadSound(url, (sound) => {
           song = sound;
-          song.loop();
-        },
-        () => {
-          console.log("error loading audio file");
-        },
-        () => {
-          console.log("now loading...");
-        }
-      );
-    } else {
-      // If the file dropped into the canvas is not an image,
-      // change the instructions to 'Not an image file!'
-      canvasText = "Not an audio file!";
-      redraw();
+          song.play();
+          updatePlaylistIcons(name);
+        });
+      });
+
+      playlistElement.appendChild(li);
+      playlist.push({ name, url });
     }
   }
+});
+
+function updatePlaylistIcons(currentName) {
+  const items = playlistElement.querySelectorAll("li");
+  items.forEach((item) => {
+    if (item.textContent.includes(currentName)) {
+      item.innerHTML = `<i class="bi bi-play-circle-fill me-2"></i>${currentName}`;
+    } else {
+      item.innerHTML = item.textContent.replace(/^🔊\s*/, "");
+    }
+  });
 }
+
+const collapseBtn = document.getElementById("collapseBtn");
+const sidebar = document.getElementById("sidebar");
+
+collapseBtn.addEventListener("click", () => {
+  const isCollapsed = sidebar.style.width === "0px";
+  if (isCollapsed) {
+    sidebar.style.width = "300px";
+    sidebar.querySelectorAll("*").forEach(el => {
+      if (el !== collapseBtn) el.style.display = "";
+    });
+    collapseBtn.innerHTML = '<i class="bi bi-chevron-left"></i>';
+  } else {
+    sidebar.style.width = "0px";
+    sidebar.querySelectorAll("*").forEach(el => {
+      if (el !== collapseBtn) el.style.display = "none";
+    });
+    collapseBtn.style.display = "block";
+    collapseBtn.innerHTML = '<i class="bi bi-chevron-right"></i>';
+  }
+});
+
+const startBtn = document.getElementById("startTimerButton");
+const startWrapper = document.getElementById("startButtonWrapper");
+
+startBtn.addEventListener("click", () => {
+  timer.start();
+  if (playlist.length > 0) {
+    let currentTrack = 0;
+    const firstTrack = playlist[0];
+    loadSound(firstTrack.url, (sound) => {
+      // if (song) song.stop();
+      song = sound;
+      song.play();
+      // song.loop();
+    });
+    setInterval(() => {
+      if(!song.isPlaying()) {
+        currentTrack++;
+        if (currentTrack >= playlist.length) {
+          currentTrack = 0;
+        }
+        const track = playlist[currentTrack];
+        loadSound(track.url, (sound) => {
+          song.stop();
+          song = sound;
+          song.play();
+          // updatePlaylistIcons(track.name);
+        });
+      }
+    }, 1000);
+    
+  }
+  startWrapper.style.display = "none";
+});

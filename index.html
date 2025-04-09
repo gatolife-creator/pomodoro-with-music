@@ -32,8 +32,7 @@
       integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
       crossorigin="anonymous"
     ></script>
-    <script src="pomorodo.js"></script>
-    <script src="sketch.js"></script>
+
     <header>
       <nav class="navbar navbar-expand-lg bg-body-tertiary shadow">
         <div class="container-fluid">
@@ -107,34 +106,46 @@
                     </div>
                   </div>
                 </div>
-                <div class="mb-3 p-3">
-                  <label for="formFileMultiple" class="form-label"
-                    >Select music</label
-                  >
-                  <input
-                    class="form-control"
-                    type="file"
-                    id="formFileMultiple"
-                    multiple
-                  />
-                </div>
-                <div class="modal-footer">
-                  <!-- <button
-                    type="button"
-                    class="btn btn-secondary"
-                    data-bs-dismiss="modal"
-                  >
-                    Close
-                  </button>
-                  <button type="button" class="btn btn-dark">
-                    Save changes
-                  </button> -->
-                </div>
               </div>
             </div>
           </div>
         </div>
       </nav>
     </header>
+    <!-- <main class="d-flex"> -->
+    <div
+      id="sidebar"
+      class="bg-light p-3 border-end"
+      style="width: 300px; height: calc(100vh - 56px); transition: width 0.3s"
+    >
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h4 class="mb-0">Playlist</h4>
+        <button id="collapseBtn" class="btn btn-sm btn-dark">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+      </div>
+      <ul id="playlist" class="list-group mb-3"></ul>
+      <div
+        id="dropZone"
+        class="border border-primary p-3 text-center"
+        style="background-color: #f9f9f9"
+      >
+        Drag & Drop audio files here
+      </div>
+    </div>
+    <div class="flex-grow-1" id="canvas-container">
+      <div
+        id="startButtonWrapper"
+        class="position-fixed start-50 translate-middle-x"
+        style="bottom: 25%"
+      >
+        <button id="startTimerButton" class="btn btn-lg btn-dark">
+          Start Timer
+        </button>
+      </div>
+    </div>
+    <!-- </main> -->
+    <script src="pomorodo.js"></script>
+    <script src="sketch.js"></script>
   </body>
 </html>

@@ -166,39 +166,20 @@ function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
 
-// function gotFile(file) {
-//   if (file.type === "audio") {
-//     console.log(file);
-//     canvasText = "Playing audio...";
-//     // redraw();
-//     loadSound(
-//       file.data,
-//       (sound) => {
-//         timer.start();
-//         if (song) {
-//           song.stop();
-//         }
-//         song = sound;
-//         song.loop();
-//       },
-//       () => {
-//         console.log("error loading audio file");
-//       },
-//       () => {
-//         console.log("now loading...");
-//       }
-//     );
-//   } else {
-//     // If the file dropped into the canvas is not an image,
-//     // change the instructions to 'Not an image file!'
-//     canvasText = "Not an audio file!";
-//     redraw();
-//   }
-// }
-
 const playlist = [];
 const playlistElement = document.getElementById("playlist");
 const dropZone = document.getElementById("dropZone");
+const fileInput = document.getElementById("fileInput");
+const fileSelectLink = document.getElementById("fileSelectLink");
+
+fileSelectLink.addEventListener("click", (e) => {
+  e.preventDefault();
+  fileInput.click();
+});
+
+fileInput.addEventListener("change", () => {
+  handleFiles(fileInput.files);
+});
 
 dropZone.addEventListener("dragover", (event) => {
   event.preventDefault();
@@ -214,6 +195,10 @@ dropZone.addEventListener("drop", (event) => {
   dropZone.classList.remove("bg-light");
 
   const files = event.dataTransfer.files;
+  handleFiles(files);
+});
+
+function handleFiles(files) {
   for (const file of files) {
     if (file.type.startsWith("audio/")) {
       const url = URL.createObjectURL(file);
@@ -238,7 +223,7 @@ dropZone.addEventListener("drop", (event) => {
       playlist.push({ name, url });
     }
   }
-});
+}
 
 function updatePlaylistIcons(currentName) {
   const items = playlistElement.querySelectorAll("li");

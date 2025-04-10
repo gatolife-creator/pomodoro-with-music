@@ -8,6 +8,7 @@
   z-index: -9999;
 }
 
-#startButtonWrapper {
+#sidebar {
+  position: fixed;
   z-index: 9999;
 }

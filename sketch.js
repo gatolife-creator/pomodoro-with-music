@@ -51,7 +51,7 @@ function setup() {
       }
     }
   };
-  
+
   // canvas.drop(gotFile);
 
   fft = new p5.FFT(0.8, 64 * 4);
@@ -141,7 +141,7 @@ function draw() {
       prevR = new Array(spectrum.length).fill(0);
     }
     prevR[i] = lerp(prevR[i], targetR, smoothness);
-    const r = prevR[i] * 2;
+    const r = map(prevR[i], 0, maxVolume, 0, timerSize / 3);
     const x2 = (timerSize / 2) * cos(angle);
     const y2 = (timerSize / 2) * sin(angle);
     const x3 = (timerSize / 2 - r) * cos(angle);
@@ -155,7 +155,7 @@ function draw() {
     // } else {
     stroke(0);
     // }
-    strokeWeight(4);
+    strokeWeight(3);
     line(x2, y2, x3, y3);
     pop();
   }
@@ -170,12 +170,12 @@ const playlist = [];
 const playlistElement = document.getElementById("playlist");
 const dropZone = document.getElementById("dropZone");
 const fileInput = document.getElementById("fileInput");
-const fileSelectLink = document.getElementById("fileSelectLink");
+// const fileSelectLink = document.getElementById("fileSelectLink");
 
-fileSelectLink.addEventListener("click", (e) => {
-  e.preventDefault();
-  fileInput.click();
-});
+// fileSelectLink.addEventListener("click", (e) => {
+//   e.preventDefault();
+//   fileInput.click();
+// });
 
 fileInput.addEventListener("change", () => {
   handleFiles(fileInput.files);
@@ -205,7 +205,8 @@ function handleFiles(files) {
       const name = file.name;
 
       const li = document.createElement("li");
-      li.className = "list-group-item d-flex justify-content-between align-items-center";
+      li.className =
+        "list-group-item d-flex justify-content-between align-items-center";
       li.textContent = name;
 
       li.addEventListener("click", () => {
@@ -243,13 +244,13 @@ collapseBtn.addEventListener("click", () => {
   const isCollapsed = sidebar.style.width === "0px";
   if (isCollapsed) {
     sidebar.style.width = "300px";
-    sidebar.querySelectorAll("*").forEach(el => {
+    sidebar.querySelectorAll("*").forEach((el) => {
       if (el !== collapseBtn) el.style.display = "";
     });
     collapseBtn.innerHTML = '<i class="bi bi-chevron-left"></i>';
   } else {
     sidebar.style.width = "0px";
-    sidebar.querySelectorAll("*").forEach(el => {
+    sidebar.querySelectorAll("*").forEach((el) => {
       if (el !== collapseBtn) el.style.display = "none";
     });
     collapseBtn.style.display = "block";
@@ -272,7 +273,7 @@ startBtn.addEventListener("click", () => {
       // song.loop();
     });
     setInterval(() => {
-      if(!song.isPlaying()) {
+      if (!song.isPlaying()) {
         currentTrack++;
         if (currentTrack >= playlist.length) {
           currentTrack = 0;
@@ -286,7 +287,6 @@ startBtn.addEventListener("click", () => {
         });
       }
     }, 1000);
-    
   }
   startWrapper.style.display = "none";
 });
